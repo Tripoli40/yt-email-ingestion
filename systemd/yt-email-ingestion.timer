@@ -1,0 +1,11 @@
+[Unit]
+Description=Run YouTube/Media Email Ingestion every 2 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+Unit=yt-email-ingestion.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

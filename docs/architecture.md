@@ -1,31 +1,47 @@
 # Architecture
 
-This project uses a simple host-native ingestion model.
-
-## Design Principles
-
-- Known-working operational pattern first
-- Minimal moving parts
-- No persistent daemon required
-- Fail-safe retry behavior
-- Human-driven ingestion trigger
+This project uses a simple host-native execution model with no long-running daemon.
 
 ## Execution Model
 
-systemd timer → oneshot service → Python script
+`systemd timer -> oneshot service -> Python script -> yt-dlp -> /srv/media/YouTube -> Jellyfin`
 
-The script performs:
+Current unit names:
 
-1. IMAP login
-2. Search for UNSEEN messages
-3. Extract supported URLs
-4. Execute yt-dlp
-5. Mark successful messages as seen
+- `yt-email-ingestion.timer`
+- `yt-email-ingestion.service`
 
-## Media Flow
+Current script path:
 
-yt-dlp writes directly to:
+- `scripts/mail_fetch.py`
 
-/srv/media/YouTube
+Current config path:
 
-Jellyfin monitors this directory and indexes new content automatically.
+- `config/config.py`
+
+## What The Script Does
+
+On each service run, the script:
+
+1. Loads environment-backed settings through `config/config.py`
+2. Connects to IMAP over SSL
+3. Searches the configured mailbox for `UNSEEN` messages
+4. Reads message content and extracts supported URLs
+5. Calls `yt-dlp` once per supported URL
+6. Leaves the message unread if any download fails
+7. Marks the message seen if all downloads for that message succeed
+
+## Media Output
+
+Downloads are written under:
+
+- `/srv/media/YouTube`
+
+Jellyfin is expected to watch that directory and pick up new files after they land.
+
+## Operational Notes
+
+- The service is `Type=oneshot`
+- There is no database, queue worker, or dedupe layer
+- The timer provides repeated polling
+- Retry is only the next timer run reprocessing messages that were left unread

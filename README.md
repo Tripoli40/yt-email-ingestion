@@ -1,77 +1,34 @@
-# Email Media Ingestion Pipeline
+# yt-email-ingestion
 
-Automated system that ingests media links sent via email and downloads them into a local media library for playback in Jellyfin.
+Host-native email-driven media ingestion for a homelab Jellyfin library.
 
-This project demonstrates practical infrastructure automation, safe secret handling, systemd scheduling, and real-world media ingestion workflows.
+The main script is `scripts/mail_fetch.py`, configuration is loaded through `config/config.py`, and the default project log file is `logs/yt-inbox.log`.
 
----
+Deployment-specific paths are documented in `docs/setup.md`.
 
-## Overview
+The service flow is simple:
 
-The system monitors an email inbox via IMAP.  
-Unread messages are scanned for supported media URLs (YouTube, TikTok, etc).  
+`systemd timer -> oneshot service -> Python script -> yt-dlp -> /srv/media/YouTube -> Jellyfin`
 
-Valid links are downloaded using `yt-dlp` and stored in a structured media library folder which is indexed by Jellyfin.
+What it does:
 
-Execution is automated via a `systemd` timer.
+- Logs into IMAP
+- Checks for unread messages
+- Extracts supported media URLs from message content
+- Runs `yt-dlp` for each supported URL
+- Marks the message seen only if all downloads for that message succeed
 
----
+Retry behavior is conditional. There is no separate retry queue or backoff system. If a download fails, the message is left unread, so `yt-email-ingestion.timer` can pick it up again on a later run. Messages with no supported URLs are marked seen and will not be retried.
 
-## Architecture
+Systemd units in this repo:
 
-Email inbox (IMAP) -> Python ingestion script -> yt-dlp media extraction -> Local media library (srv/media/YouTube) -> Jellyfin indexing + playback
+- `yt-email-ingestion.service`
+- `yt-email-ingestion.timer`
 
----
+More detail:
 
-## Features
-
-- Inbox-driven ingestion workflow
-- Unread-only trigger behavior
-- Automatic retry of failed downloads
-- Multi-site support via yt-dlp
-- Local-only execution (no inbound ports)
-- systemd timer automation
-- Secret isolation via `.env`
-- Git-safe project structure
-
----
-
-## Technology Stack
-
-- Python 3
-- yt-dlp
-- ffmpeg
-- Gmail IMAP
-- systemd timers
-- Jellyfin
-
----
-
-## Current Status
-
-Stable baseline implementation.
-
-- Manual execution validated
-- Automated polling validated
-- Successful media ingestion verified
-- Jellyfin playback verified
-
----
-
-## Known Limitations
-
-- Some YouTube formats may require PO-token support
-- Extractor reliability depends on upstream yt-dlp changes
-- Inbox scanning assumes reasonable unread-mail hygiene
-- No deduplication or database state tracking yet
-
----
-
-## Future Improvements
-
-- Message labeling / queue isolation
-- Download state database
-- Containerized deployment option
-- Notification system
-- Multi-library routing
-- Parallel ingestion workers
+- [docs/setup.md](docs/setup.md)
+- [docs/architecture.md](docs/architecture.md)
+- [docs/operations.md](docs/operations.md)
+- [docs/known_issues.md](docs/known_issues.md)
+- [docs/security.md](docs/security.md)

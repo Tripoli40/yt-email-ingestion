@@ -2,23 +2,26 @@
 
 ## Network Exposure
 
-No inbound ports required.
-
-System performs outbound IMAP + HTTPS only.
+- No inbound ports are required for normal operation
+- The script makes outbound connections for IMAP and site downloads through `yt-dlp`
 
 ## Secrets Handling
 
-Credentials stored in `.env`
-File excluded from Git
-Permissions restricted to owner
+- Credentials are stored in `.env`
+- `.env` is excluded from Git
+- `config/config.py` loads values from `.env` into the script at runtime
 
-## Execution Isolation
+This is simple secret handling for a homelab host, not a hardened secret-management system.
 
-Script runs as non-root user.
-systemd oneshot prevents long-running attack surface.
+## Execution Model
 
-## Risk Considerations
+- The service is a non-root `systemd` `oneshot` unit
+- The repo unit file runs from the repository root
+- The script path is `scripts/mail_fetch.py`
 
-- Email account compromise could trigger unwanted downloads
-- yt-dlp processes remote content
-- Library path permissions must be controlled
+## Data And Host Risks
+
+- An exposed or reused mail credential can let unwanted messages trigger downloads
+- `yt-dlp` processes remote content and depends on upstream extractor behavior
+- The media library path and the project log path should stay writable only to the intended local user
+- Security still depends on normal host hygiene around file permissions, package updates, and account access

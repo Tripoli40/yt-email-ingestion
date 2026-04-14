@@ -66,7 +66,7 @@ def extract_urls(msg):
 
     if msg.is_multipart():
         for part in msg.walk():
-            if part.get_content_type() == "text/plain":
+            if part.get_content_type() in ("text/plain", "text/html"):
                 payload = part.get_payload(decode=True)
                 if payload:
                     text = payload.decode(errors="ignore")
@@ -123,6 +123,7 @@ def main():
 
         msg = email.message_from_bytes(data[0][1])
         urls = extract_urls(msg)
+        logging.info(f"Extracted URLs: {urls}")
 
         if not urls:
             logging.info(f"No supported URLs found in message id {msg_id!r}")

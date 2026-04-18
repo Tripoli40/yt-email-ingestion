@@ -161,7 +161,7 @@ sudo cp systemd/yt-email-ingestion.service /etc/systemd/system/
 sudo cp systemd/yt-email-ingestion.timer /etc/systemd/system/
 ```
 
-Important: the checked-in service file currently contains host-specific values for:
+Important: the checked-in service file uses YOUR_USERNAME as a placeholder. Before enabling the timer, edit /etc/systemd/system/yt-email-ingestion.service and replace YOUR_USERNAME with your actual account name and adjust paths to match your <repo-root>.
 
 - `User`
 - `Group`

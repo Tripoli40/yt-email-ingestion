@@ -70,7 +70,7 @@ For the expected repo-local logging layout, set:
 
 For this host deployment, an absolute path is also valid if preferred:
 
-- `LOG_FILE=/home/nick/projects/yt-email-ingestion/logs/yt-inbox.log`
+- `LOG_FILE=/home/YOUR_USERNAME/projects/yt-email-ingestion/logs/yt-inbox.log`
 
 Other values commonly kept as-is unless your host differs:
 

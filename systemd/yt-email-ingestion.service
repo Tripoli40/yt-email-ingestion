@@ -5,10 +5,10 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-User=nick
-Group=nick
-WorkingDirectory=/home/nick/projects/yt-email-ingestion
-ExecStart=/home/nick/projects/yt-email-ingestion/.venv/bin/python /home/nick/projects/yt-email-ingestion/scripts/mail_fetch.py
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/projects/yt-email-ingestion
+ExecStart=/home/YOUR_USERNAME/projects/yt-email-ingestion/.venv/bin/python /home/YOUR_USERNAME/projects/yt-email-ingestion/scripts/mail_fetch.py
 
 [Install]
 WantedBy=multi-user.target

@@ -1,16 +1,22 @@
 # yt-email-ingestion
 
-Host-native email-driven media ingestion for a homelab Jellyfin library.
+Email-driven media ingestion pipeline for a self-hosted Jellyfin library.
+
+## Background:
+
+This was built as a part of a broader offline resilience setup. The goal is a local media library that remains accessible without the internet. It would provide reference videos on water purification, food preservation, first aid, and similar practical skills that are worth having locally rather than depending on a streaming service.
+
+Email was chosen as the trigger interface because it works from any device without requiring a dedicated app, open inbound ports, or additional attack surface on the host. You send a supported URL to a designated inbox and the pipeline handles the rest.
+
+## How It Works:
+
+'systemd timer -> oneshot service -> python script -> yt-dlp -> local media storage -> Jellyfin library'
 
 The main script is `scripts/mail_fetch.py`, configuration is loaded through `config/config.py`, and the default project log file is `logs/yt-inbox.log`.
 
 Deployment-specific paths are documented in `docs/setup.md`.
 
-The service flow is simple:
-
-`systemd timer -> oneshot service -> Python script -> yt-dlp -> /srv/media/YouTube -> Jellyfin`
-
-What it does:
+## What it does:
 
 - Logs into IMAP
 - Checks for unread messages
